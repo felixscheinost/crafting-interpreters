@@ -12,6 +12,8 @@
           mkShell {
             buildInputs = [
               #
+              nodejs
+              yarn
               jdk17_headless
               (pkgs.writeShellScriptBin "gradle" ''
                 # find project root

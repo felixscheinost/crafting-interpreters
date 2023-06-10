@@ -3,6 +3,7 @@ package de.felixscheinost.klox
 import de.felixscheinost.klox.TokenType.*
 
 class Scanner(
+  private val context: InterpretationContext,
   private val source: String
 ) {
   private val tokens: MutableList<Token> = ArrayList()
@@ -82,7 +83,7 @@ class Scanner(
         } else if (c.isLetterOrDigit()) {
           identifier();
         } else {
-          Lox.error(line, "Unexpected character.")
+          context.error(line, "Unexpected character '$c'")
         }
       }
     }
@@ -98,7 +99,7 @@ class Scanner(
       advance()
     }
     if (isAtEnd()) {
-      Lox.error(line, "Unterminated string.")
+      context.error(line, "Unterminated string.")
       return
     }
 

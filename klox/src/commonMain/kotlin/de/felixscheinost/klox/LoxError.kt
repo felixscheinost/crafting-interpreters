@@ -1,0 +1,6 @@
+package de.felixscheinost.klox
+
+class LoxError(
+  val line: Int,
+  val message: String
+)

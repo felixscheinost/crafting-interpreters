@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class ScannerTest {
   @Test
-  fun `test scanner`() {
+  fun testScanner() {
     assertTokenTypes("()", LEFT_PAREN, RIGHT_PAREN, EOF)
     assertTokenTypes("", EOF)
     assertTokenTypes(
@@ -46,7 +46,7 @@ class ScannerTest {
   private fun assertTokenTypes(source: String, vararg expected: TokenType) {
     assertEquals(
       expected.toList(),
-      Scanner(source).scanTokens().map { it.type }
+      Scanner(InterpretationContext(), source).scanTokens().map { it.type }
     )
   }
 }

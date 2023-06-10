@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream
 plugins {
   kotlin("multiplatform")
   application
+  id("com.google.devtools.ksp")
+  id("idea")
 }
 
 fun which(cmd: String): String {
@@ -55,8 +57,13 @@ kotlin {
     // This is default for LEGACY but required for the IR compiler
     binaries.executable()
   }
+  @Suppress("UNUSED_VARIABLE")
   sourceSets {
-    val commonMain by getting
+    val commonMain by getting {
+      kotlin {
+        srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+      }
+    }
     val commonTest by getting {
       dependencies {
         implementation(kotlin("test"))
@@ -66,6 +73,16 @@ kotlin {
     val jvmTest by getting
     val jsMain by getting
     val jsTest by getting
+  }
+}
+
+dependencies {
+  add("kspCommonMainMetadata", project(":ksp-plugin"))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
+  if (name != "kspCommonMainKotlinMetadata") {
+    dependsOn("kspCommonMainKotlinMetadata")
   }
 }
 

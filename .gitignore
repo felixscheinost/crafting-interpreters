@@ -1,0 +1,12 @@
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.direnv
+.DS_Store
+
+### IntelliJ IDEA ###
+.idea/**
+*.iws
+*.iml
+*.ipr
+!.idea/watcherTasks.xml

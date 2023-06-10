@@ -42,10 +42,24 @@ class Scanner(
       '>' -> addToken(if (advanceOnMatch('=')) GREATER_EQUAL else GREATER)
 
       '/' -> {
-        // Handle comments
         if (advanceOnMatch('/')) {
+          // Handle comments
           // A comment goes until the end of the line.
           while (peek() != '\n' && !isAtEnd()) {
+            advance()
+          }
+        } else if (advanceOnMatch('*')) {
+          // Handle block comments
+          // (Don't support nesting)
+          // A block comment goes until the first */
+          while (!isAtEnd() && !(peek() == '*' && peekNext() == '/')) {
+            if (peek() == '\n') {
+              line++
+            }
+            advance()
+          }
+          if (peek() == '*' && peekNext() == '/') {
+            advance()
             advance()
           }
         } else {

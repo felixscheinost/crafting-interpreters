@@ -18,7 +18,7 @@ class AstPrinterTest {
     )
     assertEquals(
       "(* (- 123) (group 45.67))",
-      expression.accept(AstPrinter())
+      expression.accept(AstPrinter)
     )
   }
 }

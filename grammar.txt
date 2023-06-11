@@ -1,11 +1,18 @@
-expression     → literal
-               | unary
-               | binary
-               | grouping ;
+# Equality has lowest precedence
+# Every primary can also be derived as unary -> factor -> term -> comparison -> equality -> expression
+expression     → equality ;
 
-literal        → NUMBER | STRING | "true" | "false" | "nil" ;
-grouping       → "(" expression ")" ;
-unary          → ( "-" | "!" ) expression ;
-binary         → expression operator expression ;
-operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
-               | "+"  | "-"  | "*" | "/" ;
+# Note: equality/comparison/term/factor are left associate
+# A more intuitive way to cover the left associativity would be to define
+# factor         → factor ( "/" | "*" ) unary
+                 | unary ;
+# But the problem with that is that it would be left-recursive
+# Our parsing technique has a problem with left-recursion
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+               | primary ;
+primary        → NUMBER | STRING | "true" | "false" | "nil"
+               | "(" expression ")" ;

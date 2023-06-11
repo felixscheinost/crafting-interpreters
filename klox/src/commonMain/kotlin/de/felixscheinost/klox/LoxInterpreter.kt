@@ -5,9 +5,11 @@ object LoxInterpreter {
     val context = InterpretationContext()
     val scanner = Scanner(context, source)
     val tokens: List<Token> = scanner.scanTokens()
-    for (token in tokens) {
-      println(token)
+    val expression = Parser(context, tokens).parse()
+    val result = context.toResult()
+    if (!result.hasError && expression != null) {
+      println(expression.accept(AstPrinter))
     }
-    return context.toResult()
+    return result
   }
 }

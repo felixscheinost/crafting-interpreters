@@ -1,0 +1,7 @@
+| Name       | Operators         | Associates |
+|------------|-------------------|------------|
+| Equality   | `==` `!=`         | Left       |
+| Comparison | `>` `>=` `<` `<=` | Left       |
+| Term       | `-` `+`           | Left       |
+| Factor     | `/` `*`           | Left       |
+| Unary      | `!` `-`           | Right      |

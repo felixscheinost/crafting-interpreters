@@ -1,6 +1,6 @@
 package de.felixscheinost.klox
 
-class AstPrinter : Expr.Visitor<String> {
+object AstPrinter : Expr.Visitor<String> {
   override fun visitBinaryExpr(left: Expr, operator: Token, right: Expr): String = parenthesize(operator.lexeme, left, right)
 
   override fun visitGroupingExpr(expr: Expr): String = parenthesize("group", expr)

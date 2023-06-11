@@ -41,6 +41,9 @@ rootProject.plugins.withType(YarnPlugin::class).whenObjectAdded {
 
 kotlin {
   jvm {
+    // withJava: needed for the application/distribution plugin. otherwise just the "common" .jar is copied which is empty.
+    //           the "meat" is in -jvm.jar
+    withJava()
     compilations.all {
       kotlinOptions.jvmTarget = "17"
     }
@@ -89,3 +92,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
 application {
   mainClass.set("de.felixscheinost.klox.Lox")
 }
+
+val testLox by tasks.registering(Exec::class) {
+  dependsOn(tasks.installDist)
+  commandLine("direnv", "exec", ".", "lox-test", "chap06_parsing", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
+}
+tasks.check.get().dependsOn(testLox)

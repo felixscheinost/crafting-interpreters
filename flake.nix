@@ -2,9 +2,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    craftinginterpreters-tools.url =
+      "github:felixscheinost/craftinginterpreters-book-nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, craftinginterpreters-tools }:
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};
       in {
@@ -12,6 +14,7 @@
           mkShell {
             buildInputs = [
               #
+              craftinginterpreters-tools.packages.${system}.craftinginterpreters-tools
               nodejs
               yarn
               jdk17_headless

@@ -24,10 +24,13 @@ class Parser(
 
   private var current: Int = 0
 
-  // Grammar: expression     → equality ;
+  // Grammar: expression     → comma ;
   private fun expression(): Expr {
-    return equality()
+    return comma()
   }
+
+  // Grammar: comma          → equality ( "," equality )* ;
+  private fun comma(): Expr = handleLeftAssociateBinary(::equality, COMMA)
 
   // Grammar: equality       → comparison ( ( "!=" | "==" ) comparison )* ;
   private fun equality(): Expr = handleLeftAssociateBinary(::comparison, BANG_EQUAL, EQUAL_EQUAL)

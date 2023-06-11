@@ -18,6 +18,10 @@ class ParserTest {
       "1 * 2.5 + 2 * 2",
       "(+ (* 1.0 2.5) (* 2.0 2.0))"
     )
+    assertParse(
+      "1 * 2.5 + 2 * 2, 1 + 2, \"foo\"",
+      "(, (, (+ (* 1.0 2.5) (* 2.0 2.0)) (+ 1.0 2.0)) foo)"
+    )
   }
 
   private fun assertParse(source: String, expectedAstPrinted: String) {

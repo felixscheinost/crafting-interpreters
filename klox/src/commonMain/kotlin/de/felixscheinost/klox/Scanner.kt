@@ -37,6 +37,8 @@ class Scanner(
       '+' -> addToken(PLUS)
       ';' -> addToken(SEMICOLON)
       '*' -> addToken(STAR)
+      '?' -> addToken(QUESTION_MARK)
+      ':' -> addToken(COLON)
       '!' -> addToken(if (advanceOnMatch('=')) BANG_EQUAL else BANG)
       '=' -> addToken(if (advanceOnMatch('=')) EQUAL_EQUAL else EQUAL)
       '<' -> addToken(if (advanceOnMatch('=')) LESS_EQUAL else LESS)

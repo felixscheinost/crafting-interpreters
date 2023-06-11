@@ -8,7 +8,8 @@ expression     → equality ;
                  | unary ;
 # But the problem with that is that it would be left-recursive
 # Our parsing technique has a problem with left-recursion
-comma          → equality ( "," equality )* ;
+comma          → ternary ( "," ternary )* ;
+ternary        → equality ( "?" ternary ":" ternary )? ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;

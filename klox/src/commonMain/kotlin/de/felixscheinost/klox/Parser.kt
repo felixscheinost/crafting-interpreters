@@ -29,8 +29,20 @@ class Parser(
     return comma()
   }
 
-  // Grammar: comma          → equality ( "," equality )* ;
-  private fun comma(): Expr = handleLeftAssociateBinary(::equality, COMMA)
+  // Grammar: comma          → ternary ( "," ternary )* ;
+  private fun comma(): Expr = handleLeftAssociateBinary(::ternary, COMMA)
+
+  // Grammar: ternary        → equality ( "?" ternary ":" ternary )? ;
+  private fun ternary(): Expr {
+    val expr = equality()
+    if (match(QUESTION_MARK)) {
+      val first = ternary()
+      consume(COLON, "Expect ':' in ternary.")
+      val second = ternary()
+      return Expr.Ternary(expr, first, second)
+    }
+    return expr
+  }
 
   // Grammar: equality       → comparison ( ( "!=" | "==" ) comparison )* ;
   private fun equality(): Expr = handleLeftAssociateBinary(::comparison, BANG_EQUAL, EQUAL_EQUAL)

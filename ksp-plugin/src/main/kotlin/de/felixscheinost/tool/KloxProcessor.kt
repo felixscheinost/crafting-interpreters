@@ -14,6 +14,7 @@ class KloxProcessor(
       "Grouping" to listOf("expr: Expr"),
       "Literal" to listOf("value: Any?"),
       "Unary" to listOf("operator: Token", "right: Expr"),
+      "Ternary" to listOf("condition: Expr", "left: Expr", "right: Expr")
     )
   }
 

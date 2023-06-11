@@ -9,6 +9,8 @@ object AstPrinter : Expr.Visitor<String> {
 
   override fun visitUnaryExpr(operator: Token, right: Expr): String = parenthesize(operator.lexeme, right)
 
+  override fun visitTernaryExpr(condition: Expr, left: Expr, right: Expr) = parenthesize("?:", condition, left, right)
+
   private fun parenthesize(name: String, vararg exprs: Expr) = buildString {
     append("(")
     append(name)

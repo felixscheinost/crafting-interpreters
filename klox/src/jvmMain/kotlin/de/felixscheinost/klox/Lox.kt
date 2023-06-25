@@ -19,26 +19,34 @@ object Lox {
   }
 
   private fun runFile(path: String) {
-    val result = Interpreter.run(Paths.get(path).readText())
+    val result = Interpreter().run(Paths.get(path).readText())
     result.printErrors()
     if (result.hasSyntaxError) {
       exitProcess(65)
     } else if (result.hasRuntimeError) {
       exitProcess(70)
-    } else {
-      println(Interpreter.stringify(result.result))
     }
   }
 
   private fun runPrompt() {
+    val interpreter = Interpreter()
     while (true) {
       print("> ")
       val line = readlnOrNull() ?: break
-      val result = Interpreter.run(line)
+
+      val resultSingleExpression = interpreter.runSingleExpression(line)
+      if (!resultSingleExpression.hasSyntaxError) {
+        if (resultSingleExpression.hasRuntimeError) {
+          resultSingleExpression.printErrors()
+        } else {
+          println(interpreter.stringify(resultSingleExpression.result))
+        }
+        continue
+      }
+
+      val result = interpreter.run(line)
       if (result.hasSyntaxError || result.hasRuntimeError) {
         result.printErrors()
-      } else {
-        println(Interpreter.stringify(result.result))
       }
     }
   }

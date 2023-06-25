@@ -97,6 +97,6 @@ application {
 val testLox by tasks.registering(Exec::class) {
   dependsOn(tasks.installDist)
   // Note: This explicitly uses `nix develop . -c` so that it also works when invoking Gradle using IntelliJ
-  commandLine("nix", "develop", ".", "-c", "lox-test", "chap07_evaluating", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
+  commandLine("nix", "develop", ".", "-c", "lox-test", "chap08_statements", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
 }
 tasks.check.get().dependsOn(testLox)

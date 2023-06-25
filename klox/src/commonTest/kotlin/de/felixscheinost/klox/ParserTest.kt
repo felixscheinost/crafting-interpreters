@@ -36,7 +36,7 @@ class ParserTest {
     val context = InterpretationContext()
     val scanner = Scanner(context, source)
     val tokens: List<Token> = scanner.scanTokens()
-    val expression = Parser(context, tokens).parse()
+    val expression = Parser(context, tokens).parseAsSingleExpression()
     assertEquals(expectedAstPrinted, expression!!.accept(AstPrinter))
   }
 }

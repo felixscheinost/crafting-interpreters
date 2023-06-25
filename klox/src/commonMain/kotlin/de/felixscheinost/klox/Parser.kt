@@ -1,32 +1,129 @@
 package de.felixscheinost.klox
 
+import de.felixscheinost.klox.Expr.Assign
 import de.felixscheinost.klox.TokenType.*
 
-
-/**
- * TODO:
- *   - Synchronization: On error, skip tokens until we get to next statement. Then start parsing again to minimize cascaded errors.
- */
 class Parser(
   private val context: InterpretationContext,
   private val tokens: List<Token>
 ) {
 
-  fun parse(): Expr? {
+  private class ParseError : RuntimeException()
+
+  private var current: Int = 0
+
+  fun parseAsSingleExpression(): Expr? {
     return try {
-      expression()
+      val expr = expression()
+      if (!isAtEnd()) {
+        error(peek(), "Couldn't parse source as single expression")
+        return null
+      }
+      expr
     } catch (error: ParseError) {
       null
     }
   }
 
-  private class ParseError : RuntimeException()
+  fun parse() = program()
 
-  private var current: Int = 0
+  // Grammar: program        → declaration* EOF ;
+  private fun program(): List<Stmt> {
+    return buildList {
+      while (!isAtEnd()) {
+        declaration()?.let(::add)
+      }
+    }
+  }
 
-  // Grammar: expression     → comma ;
+  // We could treat variable declaration the same as any other statement but we don't
+  // want to allow e.g. if (monday) var beverage = "espresso
+  // This way we define two sets of statements: One who can be used everywhere, one who can be used only in certain places
+  // Grammar: declaration    → varDecl
+  //                         | statement ;
+  private fun declaration(): Stmt? = try {
+    if (match(VAR)) {
+      varDeclaration()
+    } else {
+      statement()
+    }
+  } catch (error: ParseError) {
+    synchronize()
+    null
+  }
+
+  // Grammar: varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+  private fun varDeclaration(): Stmt {
+    val name = consume(IDENTIFIER, "Expect variable name.")
+    val initializer = if (match(EQUAL)) {
+      expression()
+    } else {
+      null
+    }
+    consume(SEMICOLON, "Expect ';' after variable declaration.")
+    return Stmt.Var(name, initializer)
+  }
+
+  // Grammar: statement      → exprStmt
+  //                         | printStmt
+  //                         | block ;
+  private fun statement(): Stmt {
+    if (match(PRINT)) {
+      return printStatement()
+    }
+    if (match(LEFT_BRACE)) {
+      return Stmt.Block(block())
+    }
+    return expressionStatement()
+  }
+
+  // Grammar: exprStmt       → expression ";" ;
+  private fun printStatement(): Stmt {
+    val value = expression()
+    consume(SEMICOLON, "Expect ';' after value.")
+    return Stmt.Print(value)
+  }
+
+  // Grammar: printStmt      → "print" expression ";" ;
+  private fun expressionStatement(): Stmt {
+    val expr = expression()
+    consume(SEMICOLON, "Expect ';' after expression.")
+    return Stmt.Expression(expr)
+  }
+
+  // Grammar: block          → "{" declaration* "}" ;
+  private fun block(): List<Stmt> {
+    val statements: MutableList<Stmt> = mutableListOf()
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
+      declaration()?.let(statements::add)
+    }
+    consume(RIGHT_BRACE, "Expect '}' after block.")
+    return statements
+  }
+
+  // Grammar: expression     → assignment ;
   private fun expression(): Expr {
-    return comma()
+    return assignment()
+  }
+
+  // assignment     → IDENTIFIER "=" assignment
+  //                | comma ;
+  private fun assignment(): Expr {
+    val expr = comma()
+
+    if (match(EQUAL)) {
+      val equals = previous()
+      val value = assignment()
+      // TODO: Right now we only allow the expression on the left hand of the `=` to be a simple global variable name
+      //       e.g. newPoint(x + 2, 0).y = 3; wouldn't work right now
+      //       we will add that later
+      if (expr is Expr.Variable) {
+        return Assign(expr.name, value)
+      }
+      error(equals, "Invalid assignment target.")
+    }
+
+    return expr
   }
 
   // Grammar: comma          → ternary ( "," ternary )* ;
@@ -68,11 +165,20 @@ class Parser(
   }
 
   private fun primary(): Expr {
-    if (match(FALSE)) return Expr.Literal(false)
-    if (match(TRUE)) return Expr.Literal(true)
-    if (match(NIL)) return Expr.Literal(null)
+    if (match(FALSE)) {
+      return Expr.Literal(false)
+    }
+    if (match(TRUE)) {
+      return Expr.Literal(true)
+    }
+    if (match(NIL)) {
+      return Expr.Literal(null)
+    }
     if (match(NUMBER, STRING)) {
       return Expr.Literal(previous().literal)
+    }
+    if (match(IDENTIFIER)) {
+      return Expr.Variable(previous())
     }
     if (match(LEFT_PAREN)) {
       val expr = expression()
@@ -158,9 +264,8 @@ class Parser(
       }
       when (peek().type) {
         CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN -> return
-        else -> {}
+        else -> advance()
       }
-      advance()
     }
   }
 }

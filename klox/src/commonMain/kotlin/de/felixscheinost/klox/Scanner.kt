@@ -83,7 +83,7 @@ class Scanner(
         if (c.isDigit()) {
           number()
         } else if (c.isLetterOrDigit()) {
-          identifier();
+          identifier()
         } else {
           context.syntaxError(line, "Unexpected character '$c'")
         }

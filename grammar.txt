@@ -1,13 +1,35 @@
+program        → declaration* EOF ;
+
+// We could treat variable declaration the same as any other statement but we don't
+// want to allow e.g. if (monday) var beverage = "espresso
+// This way we define two sets of statements: One who can be used everywhere, one who can be used only in certain places
+declaration    → varDecl
+               | statement ;
+
+varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement      → exprStmt
+               | printStmt
+               | block ;
+
+block          → "{" declaration* "}" ;
+
+exprStmt       → expression ";" ;
+printStmt      → "print" expression ";" ;
+
 # Equality has lowest precedence
 # Every primary can also be derived as unary -> factor -> term -> comparison -> equality -> expression
-expression     → equality ;
+expression     → assignment ;
 
-# Note: equality/comparison/term/factor are left associate
-# A more intuitive way to cover the left associativity would be to define
-# factor         → factor ( "/" | "*" ) unary
-                 | unary ;
-# But the problem with that is that it would be left-recursive
-# Our parsing technique has a problem with left-recursion
+assignment     → IDENTIFIER "=" assignment
+               | equality ;
+
+// Note: equality/comparison/term/factor are left associate
+// A more intuitive way to cover the left associativity would be to define
+// factor         → factor ( "/" | "*" ) unary
+//                | unary ;
+// But the problem with that is that it would be left-recursive
+// Our parsing technique has a problem with left-recursion
 comma          → ternary ( "," ternary )* ;
 ternary        → equality ( "?" ternary ":" ternary )? ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -16,5 +38,7 @@ term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
                | primary ;
-primary        → NUMBER | STRING | "true" | "false" | "nil"
-               | "(" expression ")" ;
+primary        → "true" | "false" | "nil"
+               | NUMBER | STRING
+               | "(" expression ")"
+               | IDENTIFIER ;

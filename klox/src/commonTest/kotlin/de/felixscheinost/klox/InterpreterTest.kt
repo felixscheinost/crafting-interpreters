@@ -58,14 +58,14 @@ class InterpreterTest {
     )
     assertInterpret(
       """
-        1 + "2"
+        !false
       """.trimIndent(),
-      "12",
+      true
     )
   }
 
   private fun assertInterpret(source: String, expectedResult: Any?) {
-    val result = Interpreter.run(source)
+    val result = Interpreter().runSingleExpression(source)
     assertEquals(listOf(), result.syntaxErrors)
     assertEquals(listOf(), result.runtimeErrors)
     assertEquals(expectedResult, result.result)

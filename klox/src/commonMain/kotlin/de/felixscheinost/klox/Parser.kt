@@ -134,9 +134,9 @@ class Parser(
 
   private fun error(token: Token, message: String): ParseError {
     if (token.type == EOF) {
-      context.error(line = token.line, where = " at end", message = message)
+      context.syntaxError(line = token.line, where = " at end", message = message)
     } else {
-      context.error(line = token.line, where = " at '${token.lexeme}'", message = message)
+      context.syntaxError(line = token.line, where = " at '${token.lexeme}'", message = message)
     }
     return ParseError()
   }

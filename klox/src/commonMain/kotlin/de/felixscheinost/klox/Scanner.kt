@@ -85,7 +85,7 @@ class Scanner(
         } else if (c.isLetterOrDigit()) {
           identifier();
         } else {
-          context.error(line, "Unexpected character '$c'")
+          context.syntaxError(line, "Unexpected character '$c'")
         }
       }
     }
@@ -101,7 +101,7 @@ class Scanner(
       advance()
     }
     if (isAtEnd()) {
-      context.error(line, "Unterminated string.")
+      context.syntaxError(line, "Unterminated string.")
       return
     }
 

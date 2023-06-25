@@ -15,6 +15,7 @@ fun which(cmd: String): String {
   val stdout = ByteArrayOutputStream()
   exec {
     workingDir(rootProject.projectDir)
+    // Note: This explicitly uses `nix develop . -c` so that it also works when invoking Gradle using IntelliJ
     commandLine("nix", "develop", ".", "-c", "which", cmd)
     standardOutput = stdout
     errorOutput = ByteArrayOutputStream()
@@ -90,11 +91,12 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
 }
 
 application {
-  mainClass.set("de.felixscheinost.klox.Lox")
+ mainClass.set("de.felixscheinost.klox.Lox")
 }
 
 val testLox by tasks.registering(Exec::class) {
   dependsOn(tasks.installDist)
-  commandLine("nix", "develop", ".", "-c", "lox-test", "chap06_parsing", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
+  // Note: This explicitly uses `nix develop . -c` so that it also works when invoking Gradle using IntelliJ
+  commandLine("nix", "develop", ".", "-c", "lox-test", "chap07_evaluating", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
 }
 tasks.check.get().dependsOn(testLox)

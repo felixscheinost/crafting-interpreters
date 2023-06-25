@@ -1,8 +1,13 @@
 package de.felixscheinost.klox
 
 class InterpretationResult(
-  val errors: List<LoxError>
+  val result: Any?,
+  val syntaxErrors: List<LoxSyntaxError>,
+  val runtimeErrors: List<LoxRuntimeError>
 ) {
-  val hasError: Boolean
-    get() = errors.isNotEmpty()
+  val hasSyntaxError: Boolean
+    get() = syntaxErrors.isNotEmpty()
+
+  val hasRuntimeError: Boolean
+    get() = runtimeErrors.isNotEmpty()
 }

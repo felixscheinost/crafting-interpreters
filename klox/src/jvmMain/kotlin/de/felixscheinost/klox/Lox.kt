@@ -19,10 +19,14 @@ object Lox {
   }
 
   private fun runFile(path: String) {
-    val result = LoxInterpreter.run(Paths.get(path).readText())
+    val result = Interpreter.run(Paths.get(path).readText())
     result.printErrors()
-    if (result.hasError) {
+    if (result.hasSyntaxError) {
       exitProcess(65)
+    } else if (result.hasRuntimeError) {
+      exitProcess(70)
+    } else {
+      println(Interpreter.stringify(result.result))
     }
   }
 
@@ -30,7 +34,12 @@ object Lox {
     while (true) {
       print("> ")
       val line = readlnOrNull() ?: break
-      LoxInterpreter.run(line).printErrors()
+      val result = Interpreter.run(line)
+      if (result.hasSyntaxError || result.hasRuntimeError) {
+        result.printErrors()
+      } else {
+        println(Interpreter.stringify(result.result))
+      }
     }
   }
 }

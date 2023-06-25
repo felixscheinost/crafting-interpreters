@@ -47,6 +47,10 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
       return "nil"
     }
     return if (obj is Double) {
+      // Workaround for JS: "-0.0".toString() returns "0"
+      if (obj == 0.0 && 1/obj != Double.POSITIVE_INFINITY) {
+        return "-0"
+      }
       val text = obj.toString()
       if (text.endsWith(".0")) {
         text.dropLast(2)

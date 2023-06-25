@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
@@ -53,6 +54,11 @@ kotlin {
     }
   }
   js(IR) {
+    nodejs {
+      testTask {
+        useMocha()
+      }
+    }
     browser {
       testTask {
         useMocha()
@@ -94,9 +100,34 @@ application {
  mainClass.set("de.felixscheinost.klox.Lox")
 }
 
-val testLox by tasks.registering(Exec::class) {
+val loxTestsChapter = "chap08_statements"
+
+val testLoxJvm by tasks.registering(Exec::class) {
   dependsOn(tasks.installDist)
   // Note: This explicitly uses `nix develop . -c` so that it also works when invoking Gradle using IntelliJ
-  commandLine("nix", "develop", ".", "-c", "lox-test", "chap08_statements", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
+  commandLine("nix", "develop", ".", "-c", "lox-test", loxTestsChapter, "--interpreter", buildDir.resolve("install/klox/bin/klox"))
 }
-tasks.check.get().dependsOn(testLox)
+tasks.check.get().dependsOn(testLoxJvm)
+
+val testLoxJs by tasks.registering(Exec::class) {
+  dependsOn("jsProductionExecutableCompileSync")
+  val wrapperScript = buildDir.resolve("klox-js")
+  doFirst {
+    wrapperScript.writeText(
+      """
+        #! /usr/bin/env sh
+        ${which("node")} --require ${rootProject.buildDir}/js/node_modules/source-map-support/register.js ${rootProject.buildDir}/js/packages/crafting-interpreters-klox/kotlin/crafting-interpreters-klox.js "$@"
+      """.trimIndent()
+    )
+    wrapperScript.setExecutable(true)
+  }
+  // Note: This explicitly uses `nix develop . -c` so that it also works when invoking Gradle using IntelliJ
+  commandLine("nix", "develop", ".", "-c", "lox-test", loxTestsChapter, "--interpreter", wrapperScript.absolutePath)
+}
+tasks.check.get().dependsOn(testLoxJs)
+
+(tasks.findByPath("jsNodeRun") as NodeJsExec).apply {
+  project.findProperty("args")?.let {
+    args(it)
+  }
+}

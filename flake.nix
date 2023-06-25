@@ -18,7 +18,7 @@
               nodejs
               yarn
               jdk17_headless
-              (pkgs.writeShellScriptBin "gradle" ''
+              (writeShellScriptBin "gradle" ''
                 # find project root
                 # taken from https://github.com/gradle/gradle-completion
                 dir="$PWD"

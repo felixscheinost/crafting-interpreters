@@ -15,7 +15,7 @@ fun which(cmd: String): String {
   val stdout = ByteArrayOutputStream()
   exec {
     workingDir(rootProject.projectDir)
-    commandLine("direnv", "exec", ".", "which", cmd)
+    commandLine("nix", "develop", ".", "-c", "which", cmd)
     standardOutput = stdout
     errorOutput = ByteArrayOutputStream()
   }
@@ -95,6 +95,6 @@ application {
 
 val testLox by tasks.registering(Exec::class) {
   dependsOn(tasks.installDist)
-  commandLine("direnv", "exec", ".", "lox-test", "chap06_parsing", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
+  commandLine("nix", "develop", ".", "-c", "lox-test", "chap06_parsing", "--interpreter", buildDir.resolve("install/klox/bin/klox"))
 }
 tasks.check.get().dependsOn(testLox)

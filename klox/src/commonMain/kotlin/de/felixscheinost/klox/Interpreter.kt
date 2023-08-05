@@ -48,7 +48,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
     return if (obj is Double) {
       // Workaround for JS: "-0.0".toString() returns "0"
-      if (obj == 0.0 && 1/obj != Double.POSITIVE_INFINITY) {
+      if (obj == 0.0 && 1 / obj != Double.POSITIVE_INFINITY) {
         return "-0"
       }
       val text = obj.toString()
@@ -137,6 +137,20 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
   }
 
+  override fun visitLogicalExpr(left: Expr, operator: Token, right: Expr): Any? {
+    val leftValue = left.accept(this)
+    if (operator.type == TokenType.OR) {
+      if (isTruthy(leftValue)) {
+        return leftValue
+      }
+    } else {
+      if (!isTruthy(leftValue)) {
+        return leftValue
+      }
+    }
+    return right.accept(this)
+  }
+
   override fun visitGroupingExpr(expr: Expr): Any? {
     return expr.accept(this)
   }
@@ -181,6 +195,20 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
   override fun visitVarStmt(name: Token, initializer: Expr?) {
     environment.define(name.lexeme, initializer?.accept(this))
+  }
+
+  override fun visitWhileStmt(condition: Expr, body: Stmt) {
+    while (isTruthy(condition.accept(this))) {
+      body.accept(this)
+    }
+  }
+
+  override fun visitIfStmt(condition: Expr, thenBranch: Stmt, elseBranch: Stmt?) {
+    if (isTruthy(condition.accept(this))) {
+      thenBranch.accept(this)
+    } else {
+      elseBranch?.accept(this)
+    }
   }
 
   private fun isTruthy(value: Any?) = value != null && value != false

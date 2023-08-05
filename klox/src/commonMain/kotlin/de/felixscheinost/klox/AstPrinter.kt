@@ -5,6 +5,8 @@ object AstPrinter : Expr.Visitor<String> {
 
   override fun visitBinaryExpr(left: Expr, operator: Token, right: Expr): String = parenthesize(operator.lexeme, left, right)
 
+  override fun visitLogicalExpr(left: Expr, operator: Token, right: Expr): String = parenthesize(operator.lexeme, left, right)
+
   override fun visitGroupingExpr(expr: Expr): String = parenthesize("group", expr)
 
   override fun visitLiteralExpr(value: Any?): String = value?.toString() ?: "nil"

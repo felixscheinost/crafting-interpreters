@@ -9,8 +9,20 @@ declaration    → varDecl
 varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
 
 statement      → exprStmt
+               | forStmt
+               | ifStmt
                | printStmt
+               | whileStmt
                | block ;
+
+forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+                 expression? ";"
+                 expression? ")" statement ;
+
+whileStmt      → "while" "(" expression ")" statement ;
+
+ifStmt         → "if" "(" expression ")" statement
+               ( "else" statement )? ;
 
 block          → "{" declaration* "}" ;
 
@@ -32,7 +44,9 @@ assignment     → IDENTIFIER "=" assignment
 //                | unary ;
 // But the problem with that is that it would be left-recursive
 // Our parsing technique has a problem with left-recursion
-ternary        → equality ( "?" ternary ":" ternary )? ;
+ternary        → logic_or ( "?" ternary ":" ternary )? ;
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → equality ( "and" equality )* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;

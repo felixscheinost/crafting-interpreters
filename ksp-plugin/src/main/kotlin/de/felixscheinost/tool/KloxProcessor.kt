@@ -12,6 +12,7 @@ class KloxProcessor(
     private val EXPRESSIONS = listOf(
       "Assign" to listOf("name: Token", "value: Expr"),
       "Binary" to listOf("left: Expr", "operator: Token", "right: Expr"),
+      "Logical" to listOf("left: Expr", "operator: Token", "right: Expr"),
       "Grouping" to listOf("expr: Expr"),
       "Literal" to listOf("value: Any?"),
       "Unary" to listOf("operator: Token", "right: Expr"),
@@ -23,6 +24,8 @@ class KloxProcessor(
       "Expression" to listOf("expression: Expr"),
       "Print" to listOf("expression: Expr"),
       "Var" to listOf("name: Token", "initializer: Expr?"),
+      "While" to listOf("condition: Expr", "body: Stmt"),
+      "If" to listOf("condition: Expr", "thenBranch: Stmt", "elseBranch: Stmt?"),
     )
   }
 

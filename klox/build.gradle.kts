@@ -100,7 +100,7 @@ application {
  mainClass.set("de.felixscheinost.klox.Lox")
 }
 
-val loxTestsChapter = "chap08_statements"
+val loxTestsChapter = "chap09_control"
 
 val testLoxJvm by tasks.registering(Exec::class) {
   dependsOn(tasks.installDist)

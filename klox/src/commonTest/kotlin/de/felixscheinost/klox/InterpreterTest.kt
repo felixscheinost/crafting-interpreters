@@ -62,10 +62,17 @@ class InterpreterTest {
       """.trimIndent(),
       true
     )
+    assertInterpret(
+      """
+        var foo = false;
+        !foo
+      """.trimIndent(),
+      true
+    )
   }
 
   private fun assertInterpret(source: String, expectedResult: Any?) {
-    val result = Interpreter().runSingleExpression(source)
+    val result = Interpreter(allowParseLastLineAsExpression = true).run(source)
     assertEquals(listOf(), result.syntaxErrors)
     assertEquals(listOf(), result.runtimeErrors)
     assertEquals(expectedResult, result.result)

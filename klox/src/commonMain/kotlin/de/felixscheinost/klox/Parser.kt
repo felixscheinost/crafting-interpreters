@@ -5,7 +5,8 @@ import de.felixscheinost.klox.TokenType.*
 
 class Parser(
   private val context: InterpretationContext,
-  private val tokens: List<Token>
+  private val tokens: List<Token>,
+  private val allowParseLastLineAsExpression: Boolean
 ) {
 
   private class ParseError : RuntimeException()
@@ -152,6 +153,9 @@ class Parser(
   // Grammar: printStmt      → "print" expression ";" ;
   private fun expressionStatement(): Stmt {
     val expr = expression()
+    if (allowParseLastLineAsExpression && isAtEnd()) {
+      return Stmt.Expression(expr)
+    }
     consume(SEMICOLON, "Expect ';' after expression.")
     return Stmt.Expression(expr)
   }

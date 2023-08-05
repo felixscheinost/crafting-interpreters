@@ -16,7 +16,7 @@ fun main() {
   }
 }
 
-private fun runFile(path: String) {
+private fun runFile(@Suppress("UNUSED_PARAMETER") path: String) {
   val fileText = js("require('fs').readFileSync(path, 'utf8')") as String
   val result = Interpreter().run(fileText)
   result.printErrors()

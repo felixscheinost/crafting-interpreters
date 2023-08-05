@@ -1,6 +1,8 @@
 package de.felixscheinost.klox
 
-class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+class Interpreter(
+  private val allowParseLastLineAsExpression: Boolean = false,
+) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 
   private var environment = Environment()
 
@@ -8,36 +10,18 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     val context = InterpretationContext()
     val scanner = Scanner(context, source)
     val tokens: List<Token> = scanner.scanTokens()
-    val statements = Parser(context, tokens).parse()
+    val statements = Parser(context, tokens, allowParseLastLineAsExpression = allowParseLastLineAsExpression).parse()
     if (context.hasSyntaxError) {
       return context.toResult()
     }
     try {
+      var lastResult: Any? = null
       statements.forEach { statement ->
-        statement.accept(this)
+        lastResult = statement.accept(this)
       }
-      return context.toResult()
+      return context.toResult(lastResult)
     } catch (error: LoxRuntimeError) {
       context.runtimeError(error)
-    }
-    return context.toResult()
-  }
-
-  fun runSingleExpression(source: String): InterpretationResult {
-    val context = InterpretationContext()
-    val scanner = Scanner(context, source)
-    val tokens: List<Token> = scanner.scanTokens()
-    val expression = Parser(context, tokens).parseAsSingleExpression()
-    if (context.hasSyntaxError) {
-      return context.toResult()
-    }
-    if (expression != null) {
-      try {
-        val value: Any? = expression.accept(this)
-        return context.toResult(value)
-      } catch (error: LoxRuntimeError) {
-        context.runtimeError(error)
-      }
     }
     return context.toResult()
   }
@@ -62,8 +46,8 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
   }
 
-  override fun visitBlockStmt(statements: List<Stmt>) {
-    executeBlock(statements, Environment(environment))
+  override fun visitBlockStmt(statements: List<Stmt>): Any? {
+    return executeBlock(statements, Environment(environment))
   }
 
   override fun visitAssignExpr(name: Token, value: Expr): Any? {
@@ -185,8 +169,8 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     return environment.get(name)
   }
 
-  override fun visitExpressionStmt(expression: Expr) {
-    expression.accept(this)
+  override fun visitExpressionStmt(expression: Expr): Any? {
+    return expression.accept(this)
   }
 
   override fun visitPrintStmt(expression: Expr) {
@@ -216,13 +200,15 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
   // Kotlin `==` behaves as `isEqual` is defined in the book
   private fun isEqual(a: Any?, b: Any?) = a == b
 
-  private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+  private fun executeBlock(statements: List<Stmt>, environment: Environment): Any? {
     val previous = this.environment
     try {
       this.environment = environment
+      var last: Any? = null
       statements.forEach {
-        it.accept(this)
+        last = it.accept(this)
       }
+      return last
     } finally {
       this.environment = previous
     }

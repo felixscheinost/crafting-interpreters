@@ -29,24 +29,17 @@ object Lox {
   }
 
   private fun runPrompt() {
-    val interpreter = Interpreter()
+    val interpreter = Interpreter(allowParseLastLineAsExpression = true)
     while (true) {
       print("> ")
       val line = readlnOrNull() ?: break
 
-      val resultSingleExpression = interpreter.runSingleExpression(line)
-      if (!resultSingleExpression.hasSyntaxError) {
-        if (resultSingleExpression.hasRuntimeError) {
-          resultSingleExpression.printErrors()
-        } else {
-          println(interpreter.stringify(resultSingleExpression.result))
-        }
-        continue
-      }
-
       val result = interpreter.run(line)
       if (result.hasSyntaxError || result.hasRuntimeError) {
         result.printErrors()
+      }
+      if (result.result != Unit) {
+        println(interpreter.stringify(result.result))
       }
     }
   }

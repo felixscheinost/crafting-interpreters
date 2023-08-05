@@ -101,15 +101,18 @@ class Parser(
     return statements
   }
 
-  // Grammar: expression     → assignment ;
+  // Grammar: expression     → comma ;
   private fun expression(): Expr {
-    return assignment()
+    return comma()
   }
 
+  // Grammar: comma          → assignment ( "," assignment )* ;
+  private fun comma(): Expr = handleLeftAssociateBinary(::assignment, COMMA)
+
   // assignment     → IDENTIFIER "=" assignment
-  //                | comma ;
+  //                | ternary ;
   private fun assignment(): Expr {
-    val expr = comma()
+    val expr = ternary()
 
     if (match(EQUAL)) {
       val equals = previous()
@@ -125,9 +128,6 @@ class Parser(
 
     return expr
   }
-
-  // Grammar: comma          → ternary ( "," ternary )* ;
-  private fun comma(): Expr = handleLeftAssociateBinary(::ternary, COMMA)
 
   // Grammar: ternary        → equality ( "?" ternary ":" ternary )? ;
   private fun ternary(): Expr {

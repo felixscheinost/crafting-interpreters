@@ -19,10 +19,12 @@ printStmt      → "print" expression ";" ;
 
 # Equality has lowest precedence
 # Every primary can also be derived as unary -> factor -> term -> comparison -> equality -> expression
-expression     → assignment ;
+expression     → comma ;
+
+comma          → assignment ( "," assignment )* ;
 
 assignment     → IDENTIFIER "=" assignment
-               | equality ;
+               | ternary ;
 
 // Note: equality/comparison/term/factor are left associate
 // A more intuitive way to cover the left associativity would be to define
@@ -30,7 +32,6 @@ assignment     → IDENTIFIER "=" assignment
 //                | unary ;
 // But the problem with that is that it would be left-recursive
 // Our parsing technique has a problem with left-recursion
-comma          → ternary ( "," ternary )* ;
 ternary        → equality ( "?" ternary ":" ternary )? ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;

@@ -1,7 +1,7 @@
 plugins {
-  kotlin("jvm") version "1.8.22" apply false
-  kotlin("multiplatform") version "1.8.22" apply false
-  id("com.google.devtools.ksp") version "1.8.22-1.0.11" apply false
+  kotlin("jvm") version "2.0.20" apply false
+  kotlin("multiplatform") version "2.0.20" apply false
+  id("com.google.devtools.ksp") version "2.0.20-1.0.25" apply false
   id("idea")
 }
 

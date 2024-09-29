@@ -2,6 +2,15 @@
 
 This is the repository for my work through the book [Crafting Interpreters](https://craftinginterpreters.com/).
 
+<!-- TOC -->
+* [Crafting Interpreters](#crafting-interpreters)
+  * [klox (Kotlin)](#klox-kotlin)
+    * [JVM target](#jvm-target)
+      * [Executing](#executing)
+      * [Testing](#testing)
+    * [JS target](#js-target)
+<!-- TOC -->
+
 ## klox (Kotlin)
 
 This follows the book's implementation of the Lox language in Java, but in Kotlin.

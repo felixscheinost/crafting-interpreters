@@ -3,6 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 .direnv
 .DS_Store
+.kotlin
 
 ### IntelliJ IDEA ###
 .idea/**

@@ -43,7 +43,7 @@ rootProject.plugins.withType(YarnPlugin::class).whenObjectAdded {
 }
 
 kotlin {
-  jvmToolchain(17)
+  jvmToolchain(21)
 }
 
 kotlin {

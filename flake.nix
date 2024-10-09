@@ -17,7 +17,7 @@
               craftinginterpreters-tools.packages.${system}.craftinginterpreters-tools
               nodejs
               yarn
-              jdk17_headless
+              jdk21_headless
               (writeShellScriptBin "gradle" ''
                 # find project root
                 # taken from https://github.com/gradle/gradle-completion
